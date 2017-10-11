@@ -54,11 +54,12 @@ class MidiTrack(list):
         return '<midi track {!r} {} messages>'.format(self.name, len(self))
 
 
-def _to_abstime(messages):
+def _to_abstime(messages, track_no):
     """Convert messages to absolute time."""
     now = 0
     for msg in messages:
         now += msg.time
+        msg.track_no = track_no
         yield msg.copy(time=now)
 
 
@@ -100,8 +101,8 @@ def merge_tracks(tracks):
     as if they were all in one track.
     """
     messages = []
-    for track in tracks:
-        messages.extend(_to_abstime(track))
+    for i, track in enumerate(tracks):
+        messages.extend(_to_abstime(track, i))
 
     messages.sort(key=lambda msg: msg.time)
 
